@@ -1,0 +1,21 @@
+server:
+  port: 80
+logging:
+  level:
+    cc.au.hkzk: debug
+# mybatis
+mybatis:
+  type-aliases-package: cc.au.hkzk.entity
+  # mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+## SqlServer
+spring:
+    datasource:
+      url: jdbc:sqlserver://localhost:1433;databasename=zktime606_ID
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      username: sa
+      password: SS.9erver
+
+
