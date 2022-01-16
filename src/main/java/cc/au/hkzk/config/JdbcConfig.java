@@ -11,9 +11,15 @@ import javax.sql.DataSource;
 public class JdbcConfig {
 
     @Bean
-    @ConfigurationProperties(prefix = "spring.datasource")
+    @ConfigurationProperties(prefix = "spring.datasource.hikari")
     public DataSource dataSource(){
         HikariDataSource hikariDataSource = new HikariDataSource();
         return hikariDataSource;
     }
+/*    @Bean
+    @ConfigurationProperties(prefix = "spring.datasource.hk")
+    public DataSource hk(){
+        HikariDataSource hikariDataSource = new HikariDataSource();
+        return hikariDataSource;
+    }*/
 }

@@ -13,9 +13,15 @@ mybatis:
 ## SqlServer
 spring:
     datasource:
-      url: jdbc:sqlserver://localhost:1433;databasename=zktime606_ID
-      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-      username: sa
-      password: SS.9erver
+      hikari:
+        jdbc-url: jdbc:sqlserver://localhost:1433;database=zktime606_ID
+        driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+        username: sa
+        password: SS.9erver
+      hk:
+        jdbc-url: jdbc:postgresql://localhost:7017/acs_acsdb
+        driver-class-name: org.postgresql.Driver
+        username: postgres
+        password: PostG.9re
 
 

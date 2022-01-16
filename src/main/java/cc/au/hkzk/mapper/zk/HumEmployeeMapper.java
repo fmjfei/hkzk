@@ -1,4 +1,4 @@
-package cc.au.hkzk.mapper;
+package cc.au.hkzk.mapper.zk;
 
 import cc.au.hkzk.entity.HumEmployee;
 import org.apache.ibatis.annotations.Mapper;
