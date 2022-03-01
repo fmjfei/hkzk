@@ -1,7 +1,9 @@
 package cc.au.hkzk.test;
 
-import cc.au.hkzk.entity.HumEmployee;
-import cc.au.hkzk.mapper.zk.HumEmployeeMapper;
+import cc.au.hkzk.entity.HkEmployee;
+import cc.au.hkzk.entity.ZkEmployee;
+import cc.au.hkzk.mapper.hk.HkEmployeeMapper;
+import cc.au.hkzk.mapper.zk.ZkEmployeeMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +17,14 @@ import java.util.List;
 public class HumEmployeeMapperTest {
 
     @Autowired
-    private HumEmployeeMapper humEmployeeMapper;
+    private ZkEmployeeMapper zkEmployeeMapper;
+
+    @Autowired
+    private HkEmployeeMapper hkEmployeeMapper;
 
     @Test
     public void test1(){
-        List<HumEmployee> humEmployees = humEmployeeMapper.selectAll();
+        List<ZkEmployee> zkEmployees = zkEmployeeMapper.selectAll();
+        List<HkEmployee> hkEmployees = hkEmployeeMapper.selectAll();
     }
 }

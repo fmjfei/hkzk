@@ -7,22 +7,60 @@ logging:
 mybatis:
   type-aliases-package: cc.au.hkzk.entity
   # mapper-locations: classpath:mapper/*.xml
-  configuration:
-    map-underscore-to-camel-case: true
+#  configuration:
+#    map-underscore-to-camel-case: true
 
 ## SqlServer
 spring:
     datasource:
       zk:
-        jdbc-url: jdbc:sqlserver://localhost:1433;database=zktime606_ID
+        connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
         driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-        username: sa
+        filters: stat,wall,slf4j
+        initialSize: 5
+        maxActive: 20
+        maxPoolPreparedStatementPerConnectionSize: 20
+        maxWait: 60000
+        minEvictableIdleTimeMillis: 300000
+        minIdle: 5
         password: SS.9erver
+        poolPreparedStatements: true
+        testOnBorrow: false
+        testOnReturn: false
+        testWhileIdle: true
+        timeBetweenEvictionRunsMillis: 60000
+        url: jdbc:sqlserver://localhost:1433;database=zktime606_ID
+        username: sa
+        validationQuery: select 'x'
       hk:
-        jdbc-url: jdbc:sqlserver://localhost:1433;database=zktime606_ID
+        connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
         driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-        username: sa
+        filters: stat,wall,slf4j
+        initialSize: 5
+        maxActive: 20
+        maxPoolPreparedStatementPerConnectionSize: 20
+        maxWait: 60000
+        minEvictableIdleTimeMillis: 300000
+        minIdle: 5
         password: SS.9erver
+        poolPreparedStatements: true
+        testOnBorrow: false
+        testOnReturn: false
+        testWhileIdle: true
+        timeBetweenEvictionRunsMillis: 60000
+        url: jdbc:sqlserver://192.168.1.6:1433;database=zktime606_ID
+        username: sa
+        validationQuery: select 'x'
+#      zk:
+#        jdbc-url: jdbc:sqlserver://localhost:1433;database=zktime606_ID
+#        driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#        username: sa
+#        password: SS.9erver
+#      hk:
+#        jdbc-url: jdbc:sqlserver://192.168.1.6:1433;database=zktime606_ID
+#        driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#        username: sa
+#        password: SS.9erver
 #      hk:
 #        jdbc-url: jdbc:postgresql://localhost:7017/acs_acsdb
 #        driver-class-name: org.postgresql.Driver
