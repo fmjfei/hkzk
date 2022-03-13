@@ -13,7 +13,7 @@ import java.util.Date;
 @Component
 @Data
 @Table(name="hum_employee")
-public class ZkEmployee {
+public class TestZk {
   @Id
   @KeySql(useGeneratedKeys = true)
   private Long  id;

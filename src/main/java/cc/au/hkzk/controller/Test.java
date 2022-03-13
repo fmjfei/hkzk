@@ -1,9 +1,9 @@
 package cc.au.hkzk.controller;
 
-import cc.au.hkzk.entity.HkEmployee;
-import cc.au.hkzk.entity.ZkEmployee;
-import cc.au.hkzk.mapper.hk.HkEmployeeMapper;
-import cc.au.hkzk.mapper.zk.ZkEmployeeMapper;
+import cc.au.hkzk.entity.TestHk;
+import cc.au.hkzk.entity.TestZk;
+import cc.au.hkzk.mapper.hk.TestHkMapper;
+import cc.au.hkzk.mapper.zk.TestZkMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,36 +13,36 @@ import java.util.List;
 @RestController
 public class Test {
     @Autowired
-    private ZkEmployeeMapper userInfoOneMapper;
+    private TestZkMapper userInfoOneMapper;
     @Autowired
-    private HkEmployeeMapper userInfoTwoMapper;
+    private TestHkMapper userInfoTwoMapper;
 
 
     @RequestMapping("/getOneUserById")
-    public ZkEmployee getOneUserById(Long id){
-        ZkEmployee entity = new ZkEmployee();
+    public TestZk getOneUserById(Long id){
+        TestZk entity = new TestZk();
         entity.setId(id);
-        ZkEmployee entity1 = userInfoOneMapper.selectOne(entity);
+        TestZk entity1 = userInfoOneMapper.selectOne(entity);
         return entity1;
     }
 
     @RequestMapping("/getAllUserForOne")
-    public List<ZkEmployee> getAllUserForOne(){
-        List<ZkEmployee> allUser = userInfoOneMapper.selectAll();
+    public List<TestZk> getAllUserForOne(){
+        List<TestZk> allUser = userInfoOneMapper.selectAll();
         return allUser;
     }
 
     @RequestMapping("/getTwoUserById")
-    public HkEmployee getTwoUserById(Long id){
-        HkEmployee entity = new HkEmployee();
+    public TestHk getTwoUserById(Long id){
+        TestHk entity = new TestHk();
         entity.setId(id);
-        HkEmployee entity1 = userInfoTwoMapper.selectOne(entity);
+        TestHk entity1 = userInfoTwoMapper.selectOne(entity);
         return entity1;
     }
 
     @RequestMapping("/getAllUserForTwo")
-    public List<HkEmployee> getAllUserForTwo(){
-        List<HkEmployee> allUser = userInfoTwoMapper.selectAll();
+    public List<TestHk> getAllUserForTwo(){
+        List<TestHk> allUser = userInfoTwoMapper.selectAll();
         return allUser;
     }
 }
