@@ -48,6 +48,11 @@ public class EmpCardSync {
         String result = "需要更新"+hkinfos.size()+"条数据:";
         for(HkInfo hki:hkinfos){
 
+            //Temp TEST
+/*            result += result + "<br>TEST::" + hki.toString();
+            log.debug(result);
+            continue;*/
+
             if(-1 == hki.getStatus()){
                 //老员工离职
                 log.debug("老员工离职--->");
@@ -59,13 +64,17 @@ public class EmpCardSync {
                 zkedel.createCriteria().andEqualTo("empno",hki.getCertno());
                 int delc1 = zkemp.deleteByExample(zkedel);
 
-                String res = "老员工"+hki.toString()+"离职删除"+hki.toString()+"信息"+delc1+"行，删除卡信息"+delc2+"行和"+delc3+"行";
+                String res = "老员工"+hki.toString()+"离职删除信息"+delc1+"行，删除卡信息"+delc2+"行和"+delc3+"行";
                 log.debug(res);
                 result = result + "\n<br>" + res;
 
             } else if (newEmp(hki.getCertno())) {
                 //新员工新卡
                 log.debug("新员工新卡--->");
+                if(-1 == hki.getCardstatus()){
+                    log.debug("新员工卡信息无效，跳过。");
+                    continue;
+                }
                 ZkEmployee newemp = new ZkEmployee();
                 int i1 = zkemp.insert(setNewEmp(hki));
                 int i2 = zkcard.insert(setNewCard(hki));
@@ -89,7 +98,11 @@ public class EmpCardSync {
                 int in1 = zkcard.insert(setNewCard(hki));
                 int in2 = zkmcharg.insert(setNewMc(hki));
 
-                String res = "老员工"+hki.toString()+"新增新卡数据"+in1+"和"+in2+"行";
+                Example zkeupd = new Example(ZkEmployee.class);
+                zkeupd.createCriteria().andEqualTo("empno",hki.getCertno());
+                int updc1 = zkemp.updateByExampleSelective(setNewEmp(hki),zkeupd);
+
+                String res = "老员工"+hki.toString()+"新增新卡数据"+in1+"和"+in2+"行,更新绑定信息"+updc1+"行";
                 log.debug(res);
                 result = result + "\n<br>" + res;
             } else {
