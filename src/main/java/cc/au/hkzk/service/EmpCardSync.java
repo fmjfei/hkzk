@@ -39,6 +39,7 @@ public class EmpCardSync {
         Date boundary = null;
         if(0L == testDate) {
             boundary = hkinfo.getNowTime();
+            log.warn("HKDB");
         }
         else{
             boundary = new Date(testDate);  // 1646064000000L 22年3月1日
@@ -48,9 +49,8 @@ public class EmpCardSync {
         String result = "需要更新"+hkinfos.size()+"条数据:";
         for(HkInfo hki:hkinfos){
 
-            //Temp TEST
-/*            result += result + "<br>TEST::" + hki.toString();
-            log.debug(result);
+/*            //Temp TEST
+            result += "<br>TEST::" + hki.toString();
             continue;*/
 
             if(-1 == hki.getStatus()){
@@ -120,6 +120,7 @@ public class EmpCardSync {
                 result = result + "\n<br>" + res;
             }
         }
+        log.warn(result);
         return result;
     }
 
