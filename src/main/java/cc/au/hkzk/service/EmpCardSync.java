@@ -1,10 +1,8 @@
 package cc.au.hkzk.service;
 
-import cc.au.hkzk.entity.HkInfo;
-import cc.au.hkzk.entity.ZkCardinfo;
-import cc.au.hkzk.entity.ZkEmployee;
-import cc.au.hkzk.entity.ZkMchargere;
+import cc.au.hkzk.entity.*;
 import cc.au.hkzk.mapper.hk.HkInfoMapper;
+import cc.au.hkzk.mapper.zk.ZkBackupMapper;
 import cc.au.hkzk.mapper.zk.ZkCardinfoMapper;
 import cc.au.hkzk.mapper.zk.ZkEmployeeMapper;
 import cc.au.hkzk.mapper.zk.ZkMchargereMapper;
@@ -33,20 +31,27 @@ public class EmpCardSync {
     @Autowired
     ZkMchargereMapper zkmcharg;
 
+    @Autowired
+    ZkBackupMapper zkbm;
+
     @Transactional(rollbackFor = Exception.class)
     public String SyncZkData(Long testDate){
-
+        String result = "";
         Date boundary = null;
         if(0L == testDate) {
             boundary = hkinfo.getNowTime();
-            log.warn("HKDB");
+            result = "更新执行时间::" + boundary.toString();
+
+            Example last = new Example(ZkBackup.class);
+            last.orderBy("synctime").desc();
+            ZkBackup zkbl = zkbm.selectOneByExample(last);
         }
         else{
             boundary = new Date(testDate);  // 1646064000000L 22年3月1日
-            log.debug("TEST指定日期之后的数据::"+boundary.toString());
+            result = "TEST指定日期之后的数据::"+boundary.toString();
         }
         List<HkInfo> hkinfos = hkinfo.getUpdateInfo(boundary);
-        String result = "需要更新"+hkinfos.size()+"条数据:";
+        result = "\n需要更新"+hkinfos.size()+"条数据:";
         for(HkInfo hki:hkinfos){
 
 /*            //Temp TEST
@@ -57,6 +62,8 @@ public class EmpCardSync {
                 //老员工离职
                 log.debug("老员工离职--->");
                 //TODO 暂且认为删除离职员工卡号没有问题，不影响原有刷卡记录，但需要测试
+                backup(hki.getCertno(),hki.getCardnumber(),"Old Emp DELETE");
+
                 int delc2 = zkcard.deleteByPrimaryKey(hki.getCardnumber());
                 int delc3 = zkmcharg.deleteByPrimaryKey(hki.getCardnumber());
 
@@ -86,6 +93,8 @@ public class EmpCardSync {
             } else if (-1 == hki.getCardstatus()) {
                 //老员工旧卡删除
                 log.debug("老员工旧卡删除--->");
+                backup(null,hki.getCardnumber(),"Old Emp Card DELETE");
+
                 int delc1 = zkcard.deleteByPrimaryKey(hki.getCardnumber());
                 int delc2 = zkmcharg.deleteByPrimaryKey(hki.getCardnumber());
 
@@ -94,6 +103,8 @@ public class EmpCardSync {
                 result = result + "\n<br>" + res;
             } else if (newCard(hki.getCardnumber())){
                 //老员工增加新卡
+                backup(hki.getCertno(),null,"Old Emp Card ADD");
+
                 log.debug("老员工增加新卡--->");
                 int in1 = zkcard.insert(setNewCard(hki));
                 int in2 = zkmcharg.insert(setNewMc(hki));
@@ -108,6 +119,8 @@ public class EmpCardSync {
             } else {
                 //老员工信息变更
                 log.debug("老员工信息变更--->");
+                backup(hki.getCertno(),hki.getCardnumber(),"Old Emp Info CHANGE");
+
                 int u1 = zkcard.updateByPrimaryKey(setNewCard(hki));
                 int u2 = zkmcharg.updateByPrimaryKey(setNewMc(hki));
 
@@ -181,5 +194,40 @@ public class EmpCardSync {
         newmc.setDeptname(hk.getOrgname());
         newmc.setDeptno(hk.getOrgcode());
         return newmc;
+    }
+
+    private void backup(String empno, String cardno, String rmk){
+        ZkBackup zkb = null;
+        if(null != empno){
+            Example zkesel = new Example(ZkEmployee.class);
+            zkesel.createCriteria().andEqualTo("empno",empno);
+            ZkEmployee zke = zkemp.selectOneByExample(zkesel);
+            if(null != zke){
+                zkb = new ZkBackup();
+                zkb.setDeptno(zke.getDeptno());
+                zkb.setDeptname(zke.getDeptname());
+                zkb.setEmpno(zke.getEmpno());
+                zkb.setEmpname(zke.getEmpname());
+                zkb.setCardId(zke.getCardId());
+                zkb.setIssueDate(zke.getIssueDate());
+                zkb.setCheckindt(zke.getCheckindt());
+                zkb.setUpdtime(zke.getModifytime());
+            }
+        }
+        if(null != cardno){
+            ZkCardinfo zkc = zkcard.selectByPrimaryKey(cardno);
+            if(null != zkc){
+                if(null == zkb) zkb = new ZkBackup();
+                zkb.setIsvalid(zkc.getIsvalid());
+                zkb.setCardSequ(zkc.getCardSequ());
+                zkb.setCardStatus(zkc.getCardStatus());
+                zkb.setValidDate(zkc.getValidDate());
+            }
+        }
+        if(null != zkb){
+            zkb.setSynctime(new Date());
+            zkb.setRemarks(rmk);
+            zkbm.insert(zkb);
+        }
     }
 }
