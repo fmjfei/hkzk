@@ -23,6 +23,6 @@ public class ZkBackup {
     private Integer cardStatus; //1正常，2挂失
     private Date validDate;
 
-    private Date synctime;
-    private String remarks;
+    private Date synctime = new Date();
+    private String remarks = "Default Add";
 }

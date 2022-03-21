@@ -2,10 +2,7 @@ package cc.au.hkzk.service;
 
 import cc.au.hkzk.entity.*;
 import cc.au.hkzk.mapper.hk.HkInfoMapper;
-import cc.au.hkzk.mapper.zk.ZkBackupMapper;
-import cc.au.hkzk.mapper.zk.ZkCardinfoMapper;
-import cc.au.hkzk.mapper.zk.ZkEmployeeMapper;
-import cc.au.hkzk.mapper.zk.ZkMchargereMapper;
+import cc.au.hkzk.mapper.zk.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,6 +15,9 @@ import java.util.List;
 @Slf4j
 @Component
 public class EmpCardSync {
+
+    @Autowired
+    ZkLastUpdTimeMapper zkl;
 
     @Autowired
     HkInfoMapper hkinfo;
@@ -39,19 +39,15 @@ public class EmpCardSync {
         String result = "";
         Date boundary = null;
         if(0L == testDate) {
-            boundary = hkinfo.getNowTime();
-            result = "更新执行时间::" + boundary.toString();
-
-            Example last = new Example(ZkBackup.class);
-            last.orderBy("synctime").desc();
-            ZkBackup zkbl = zkbm.selectOneByExample(last);
+            boundary = zkl.getLast();
+            result = "自上次更新时间::" + boundary.toString();
         }
         else{
             boundary = new Date(testDate);  // 1646064000000L 22年3月1日
-            result = "TEST指定日期之后的数据::"+boundary.toString();
+            result = "TEST指定日期::"+boundary.toString();
         }
         List<HkInfo> hkinfos = hkinfo.getUpdateInfo(boundary);
-        result = "\n需要更新"+hkinfos.size()+"条数据:";
+        result += "\n 之后需要再更新"+hkinfos.size()+"条数据:";
         for(HkInfo hki:hkinfos){
 
 /*            //Temp TEST
@@ -82,7 +78,8 @@ public class EmpCardSync {
                     log.debug("新员工卡信息无效，跳过。");
                     continue;
                 }
-                ZkEmployee newemp = new ZkEmployee();
+
+                zkbm.insert(new ZkBackup());
                 int i1 = zkemp.insert(setNewEmp(hki));
                 int i2 = zkcard.insert(setNewCard(hki));
                 int i3 = zkmcharg.insert(setNewMc(hki));
@@ -218,6 +215,7 @@ public class EmpCardSync {
             ZkCardinfo zkc = zkcard.selectByPrimaryKey(cardno);
             if(null != zkc){
                 if(null == zkb) zkb = new ZkBackup();
+                zkb.setCardId(zkc.getSysId());
                 zkb.setIsvalid(zkc.getIsvalid());
                 zkb.setCardSequ(zkc.getCardSequ());
                 zkb.setCardStatus(zkc.getCardStatus());
@@ -225,7 +223,6 @@ public class EmpCardSync {
             }
         }
         if(null != zkb){
-            zkb.setSynctime(new Date());
             zkb.setRemarks(rmk);
             zkbm.insert(zkb);
         }
